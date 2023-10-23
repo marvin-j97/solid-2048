@@ -164,13 +164,23 @@ function fieldsAreEqual(a: Tile[], b: Tile[]): boolean {
   return a.every((a, i) => b[i]!.value === a.value);
 }
 
+const HIGHSCORE_LOCAL_STORAGE_KEY = "highscore"
+
 export default function Game(): JSXElement {
   const [field, setField] = createSignal(createInitialField());
   const [hasWon, setWin] = createSignal(false);
   const [score, setScore] = createSignal(0);
+  const [highscore, setHighscore] = createSignal(0);
 
   function addScore(points: number): void {
     setScore(x => x + points);
+
+    const newScore = score();
+
+    if (newScore > highscore()) {
+      localStorage.setItem(HIGHSCORE_LOCAL_STORAGE_KEY, newScore.toString());
+      setHighscore(newScore);
+    }
   }
 
   function reset(): void {
@@ -186,6 +196,8 @@ export default function Game(): JSXElement {
   });
 
   onMount(() => {
+    setHighscore(+(localStorage.getItem(HIGHSCORE_LOCAL_STORAGE_KEY) ?? "0"));
+
     const handler = (ev: KeyboardEvent) => {
       if (hasWon()) {
         return;
@@ -249,7 +261,8 @@ export default function Game(): JSXElement {
 
   return <div>
     <div class="text-center mb-5">
-      <button class="text-lg font-medium text-blue-500 dark:text-blue-300" onClick={reset}>Score: {score()}</button>
+      <div class="text-lg font-medium text-blue-500 dark:text-blue-300" >Score: {score()}</div>
+      <div class="text-lg font-medium text-amber-700 dark:text-amber-300" >Highscore: {highscore()}</div>
     </div>
     <div class="flex justify-center mb-5">
       <button class="bg-blue-500 dark:bg-blue-300 text-white dark:text-black px-3 py-2 rounded" onClick={reset}>Reset</button>
