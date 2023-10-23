@@ -1,0 +1,32 @@
+name: Deploy page
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Use Node.js 20
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+      - name: Generate page
+        run: pnpm build
+      - name: Deploy page
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: dist
