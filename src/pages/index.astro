@@ -1,0 +1,43 @@
+---
+import Game from "../components/Game";
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Solid 2048</title>
+		<meta name="description" content="2048 in SolidJS" />
+	</head>
+	<body class="p-2 mx-auto max-w-xl w-full">
+		<main class="flex flex-col gap-10">
+			<h1 class="text-center text-3xl">
+				<span class="text-blue-500">Solid</span>{" "}
+				<span class="font-bold text-neutral-400">2048</span>
+			</h1>
+			<Game client:only />
+		</main>
+	</body>
+	<style is:global>
+		* {
+			overflow: hidden;
+		}
+
+		.group-item {
+			transition: all 0.4s;
+		}
+
+		.group-item-enter,
+		.group-item-exit-to {
+			opacity: 0;
+		}
+
+		.group-item-exit-active {
+			position: absolute;
+			width: 0px;
+			height: 0px;
+		}
+	</style>
+</html>
