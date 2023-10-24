@@ -8,7 +8,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "fmt": "prettier"
+    "fmt": "prettier . --write"
   },
   "devDependencies": {
     "@astrojs/solid-js": "3.0.2",

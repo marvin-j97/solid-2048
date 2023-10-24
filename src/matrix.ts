@@ -6,7 +6,7 @@ export function build4x4Matrix<T>(arr: T[]): Matrix<T> {
     [arr[4]!, arr[5]!, arr[6]!, arr[7]!],
     [arr[8]!, arr[9]!, arr[10]!, arr[11]!],
     [arr[12]!, arr[13]!, arr[14]!, arr[15]!],
-  ]
+  ];
 }
 
 export function flattenMatrix<T>(matrix: Matrix<T>): T[] {
@@ -43,4 +43,3 @@ export function rotateMatrixLeft<T>(matrix: Matrix<T>): Matrix<T> {
 
   return copy as Matrix<T>;
 }
-

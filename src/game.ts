@@ -1,8 +1,15 @@
 import { createEffect, createSignal, onMount, onCleanup } from "solid-js";
 
-import { flattenMatrix, build4x4Matrix, rotateMatrixLeft, rotateMatrixRight, shallowCopyMatrix, type Matrix } from "./matrix";
+import {
+  flattenMatrix,
+  build4x4Matrix,
+  rotateMatrixLeft,
+  rotateMatrixRight,
+  shallowCopyMatrix,
+  type Matrix,
+} from "./matrix";
 
-const HIGHSCORE_LOCAL_STORAGE_KEY = "highscore"
+const HIGHSCORE_LOCAL_STORAGE_KEY = "highscore";
 
 type Direction = "left" | "right" | "up" | "down";
 
@@ -10,9 +17,9 @@ const N = 4;
 
 type Tile = {
   value: number;
-}
+};
 
-const box = (x: number): Tile => ({ value: x })
+const box = (x: number): Tile => ({ value: x });
 
 function spawnRandomTile(arr: Tile[], count = 1): Tile[] {
   const copy = [...arr];
@@ -20,7 +27,7 @@ function spawnRandomTile(arr: Tile[], count = 1): Tile[] {
   let created = 0;
 
   while (created < count) {
-    if (copy.every(x => x.value > 0)) {
+    if (copy.every((x) => x.value > 0)) {
       return copy;
     }
 
@@ -37,7 +44,7 @@ function spawnRandomTile(arr: Tile[], count = 1): Tile[] {
 }
 
 function createInitialField(): Tile[] {
-  const field = new Array(N * N).fill(0).map(_ => box(0));
+  const field = new Array(N * N).fill(0).map((_) => box(0));
   return spawnRandomTile(field, 2);
 }
 
@@ -105,8 +112,7 @@ function shiftMatrixRight(input: Matrix<Tile>, addScore: (x: number) => void): M
 
         if (nextTile.value === 0) {
           indexToMoveTo += 1;
-        }
-        else {
+        } else {
           break;
         }
       }
@@ -133,7 +139,7 @@ export function createGame() {
   const [highscore, setHighscore] = createSignal(0);
 
   function addScore(points: number): void {
-    setScore(x => x + points);
+    setScore((x) => x + points);
 
     const newScore = score();
 
@@ -150,7 +156,7 @@ export function createGame() {
   }
 
   createEffect(() => {
-    if (field().some(x => x.value === 2_048)) {
+    if (field().some((x) => x.value === 2_048)) {
       setWin(true);
     }
   });
@@ -178,7 +184,7 @@ export function createGame() {
       case "up": {
         const matrix = build4x4Matrix(field());
         const rotatedMatrixView = r(matrix);
-        const shifted = shiftMatrixRight(rotatedMatrixView, (n) => deltaScore += n);
+        const shifted = shiftMatrixRight(rotatedMatrixView, (n) => (deltaScore += n));
         const rotatedBack = l(shifted);
         const nextField = flattenMatrix(rotatedBack);
         onMove(nextField);
@@ -187,7 +193,7 @@ export function createGame() {
       case "down": {
         const matrix = build4x4Matrix(field());
         const rotatedMatrixView = r(r(r(matrix)));
-        const shifted = shiftMatrixRight(rotatedMatrixView, (n) => deltaScore += n);
+        const shifted = shiftMatrixRight(rotatedMatrixView, (n) => (deltaScore += n));
         const rotatedBack = l(l(l(shifted)));
         const nextField = flattenMatrix(rotatedBack);
         onMove(nextField);
@@ -195,7 +201,7 @@ export function createGame() {
       }
       case "right": {
         const matrixView = build4x4Matrix(field());
-        const shifted = shiftMatrixRight(matrixView, (n) => deltaScore += n);
+        const shifted = shiftMatrixRight(matrixView, (n) => (deltaScore += n));
         const nextField = flattenMatrix(shifted);
         onMove(nextField);
         break;
@@ -203,7 +209,7 @@ export function createGame() {
       case "left": {
         const matrix = build4x4Matrix(field());
         const rotatedMatrixView = r(r(matrix));
-        const shifted = shiftMatrixRight(rotatedMatrixView, (n) => deltaScore += n);
+        const shifted = shiftMatrixRight(rotatedMatrixView, (n) => (deltaScore += n));
         const rotatedBack = l(l(shifted));
         const nextField = flattenMatrix(rotatedBack);
         onMove(nextField);
@@ -241,7 +247,7 @@ export function createGame() {
     onCleanup(() => {
       document.removeEventListener("keydown", handler);
     });
-  })
+  });
 
   onMount(() => {
     let xDown: number | null = null;
@@ -254,7 +260,7 @@ export function createGame() {
         xDown = touch.clientX;
         yDown = touch.clientY;
       }
-    };
+    }
 
     function handleTouchMove(ev: TouchEvent) {
       if (!xDown || !yDown) {
@@ -275,30 +281,29 @@ export function createGame() {
 
       if (Math.abs(xDiff) > Math.abs(yDiff)) {
         if (xDiff > 0) {
-          onInput("left")
+          onInput("left");
         } else {
-          onInput("right")
+          onInput("right");
         }
       } else {
         if (yDiff > 0) {
-          onInput("up")
+          onInput("up");
         } else {
-          onInput("down")
+          onInput("down");
         }
       }
 
       // Reset values
       xDown = null;
       yDown = null;
-    };
+    }
 
-
-    document.addEventListener('touchstart', handleTouchStart);
-    document.addEventListener('touchmove', handleTouchMove);
+    document.addEventListener("touchstart", handleTouchStart);
+    document.addEventListener("touchmove", handleTouchMove);
 
     onCleanup(() => {
-      document.removeEventListener('touchstart', handleTouchStart)
-      document.removeEventListener('touchend', handleTouchMove)
+      document.removeEventListener("touchstart", handleTouchStart);
+      document.removeEventListener("touchend", handleTouchMove);
     });
   });
 
@@ -308,5 +313,5 @@ export function createGame() {
     reset,
     score,
     highscore,
-  }
+  };
 }
