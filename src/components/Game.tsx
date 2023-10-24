@@ -356,26 +356,24 @@ export default function Game(): JSXElement {
       <TransitionGroup name="group-item">
         <For each={field()} fallback={<div>fallback</div>}>
           {(item) => (
-            <>
-              <div classList={{
-                "bg-blue-200 dark:bg-blue-900": item.value === 0,
-                "bg-indigo-300 dark:bg-indigo-800 text-indigo-800 dark:text-indigo-400": item.value === 2,
-                "bg-indigo-400 dark:bg-indigo-700 text-indigo-900 dark:text-indigo-300": item.value === 4,
-                "bg-violet-300 dark:bg-violet-800 text-violet-800 dark:text-violet-400": item.value === 8,
-                "bg-violet-400 dark:bg-violet-700 text-violet-900 dark:text-violet-300": item.value === 16,
-                "bg-purple-300 dark:bg-purple-800 text-purple-800 dark:text-violet-400": item.value === 32,
-                "bg-purple-400 dark:bg-purple-700 text-purple-900 dark:text-violet-300": item.value === 64,
-                "bg-fuchsia-300 dark:bg-fuchsia-800 text-fuchsia-800 dark:text-fuchsia-400": item.value === 128,
-                "bg-fuchsia-400 dark:bg-fuchsia-700 text-fuchsia-900 dark:text-fuchsia-400": item.value === 256,
-                "bg-pink-300 dark:bg-pink-800 text-pink-800 dark:text-pink-400": item.value === 512,
-                "bg-pink-400 dark:bg-pink-700 text-pink-900 dark:text-pink-300": item.value === 1_024,
-                "bg-red-500 dark:bg-red-600 text-red-900 dark:text-red-100": item.value === 2_048,
-              }} class="group-item rounded text-2xl font-bold flex justify-center items-center w-full aspect-ratio-square">
-                <Show when={item.value > 0}>
-                  <span>{item.value}</span>
-                </Show>
-              </div>
-            </>
+            <div classList={{
+              "bg-blue-200 dark:bg-blue-900": item.value === 0,
+              "bg-indigo-300 dark:bg-indigo-800 text-indigo-800 dark:text-indigo-400": item.value === 2,
+              "bg-indigo-400 dark:bg-indigo-700 text-indigo-900 dark:text-indigo-300": item.value === 4,
+              "bg-violet-300 dark:bg-violet-800 text-violet-800 dark:text-violet-400": item.value === 8,
+              "bg-violet-400 dark:bg-violet-700 text-violet-900 dark:text-violet-300": item.value === 16,
+              "bg-purple-300 dark:bg-purple-800 text-purple-800 dark:text-violet-400": item.value === 32,
+              "bg-purple-400 dark:bg-purple-700 text-purple-900 dark:text-violet-300": item.value === 64,
+              "bg-fuchsia-300 dark:bg-fuchsia-800 text-fuchsia-800 dark:text-fuchsia-400": item.value === 128,
+              "bg-fuchsia-400 dark:bg-fuchsia-700 text-fuchsia-900 dark:text-fuchsia-400": item.value === 256,
+              "bg-pink-300 dark:bg-pink-800 text-pink-800 dark:text-pink-400": item.value === 512,
+              "bg-pink-400 dark:bg-pink-700 text-pink-900 dark:text-pink-300": item.value === 1_024,
+              "bg-red-500 dark:bg-red-600 text-red-900 dark:text-red-100": item.value === 2_048,
+            }} class="group-item rounded text-2xl font-bold flex justify-center items-center w-full aspect-ratio-square">
+              <Show when={item.value > 0}>
+                <span>{item.value}</span>
+              </Show>
+            </div>
           )}
         </For>
       </TransitionGroup>
