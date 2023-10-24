@@ -55,7 +55,7 @@ function shallowCopyMatrix<T>(matrix: Matrix<T>): Matrix<T> {
   return copiedMatrix as Matrix<T>;
 }
 
-function rotateMatrixClockwise<T>(matrix: Matrix<T>): Matrix<T> {
+function rotateMatrixRight<T>(matrix: Matrix<T>): Matrix<T> {
   const copy = shallowCopyMatrix(matrix);
 
   matrix.forEach((row, i) => {
@@ -67,7 +67,7 @@ function rotateMatrixClockwise<T>(matrix: Matrix<T>): Matrix<T> {
   return copy as Matrix<T>;
 }
 
-function rotateMatrixCounterClockwise<T>(matrix: Matrix<T>): Matrix<T> {
+function rotateMatrixLeft<T>(matrix: Matrix<T>): Matrix<T> {
   const copy = shallowCopyMatrix(matrix);
 
   matrix.forEach((row, i) => {
@@ -195,69 +195,152 @@ export default function Game(): JSXElement {
     }
   });
 
+  function onInput(key: "left" | "right" | "up" | "down"): void {
+    if (hasWon()) {
+      return;
+    }
+
+    let deltaScore = 0;
+
+    function onMove(nextField: Tile[]) {
+      if (fieldsAreEqual(field(), nextField)) {
+        return;
+      }
+
+      setField(spawnRandomTile(nextField));
+      addScore(deltaScore);
+    }
+
+    const l = rotateMatrixLeft;
+    const r = rotateMatrixRight;
+
+    switch (key) {
+      case "up": {
+        const matrix = buildMatrix(field());
+        const rotatedMatrixView = r(matrix);
+        const shifted = shiftMatrixRight(rotatedMatrixView, (n) => deltaScore += n);
+        const rotatedBack = l(shifted);
+        const nextField = matrixToField(rotatedBack);
+        onMove(nextField);
+        break;
+      }
+      case "down": {
+        const matrix = buildMatrix(field());
+        const rotatedMatrixView = r(r(r(matrix)));
+        const shifted = shiftMatrixRight(rotatedMatrixView, (n) => deltaScore += n);
+        const rotatedBack = l(l(l(shifted)));
+        const nextField = matrixToField(rotatedBack);
+        onMove(nextField);
+        break;
+      }
+      case "right": {
+        const matrixView = buildMatrix(field());
+        const shifted = shiftMatrixRight(matrixView, (n) => deltaScore += n);
+        const nextField = matrixToField(shifted);
+        onMove(nextField);
+        break;
+      }
+      case "left": {
+        const matrix = buildMatrix(field());
+        const rotatedMatrixView = r(r(matrix));
+        const shifted = shiftMatrixRight(rotatedMatrixView, (n) => deltaScore += n);
+        const rotatedBack = l(l(shifted));
+        const nextField = matrixToField(rotatedBack);
+        onMove(nextField);
+        break;
+      }
+    }
+  }
+
   onMount(() => {
     setHighscore(+(localStorage.getItem(HIGHSCORE_LOCAL_STORAGE_KEY) ?? "0"));
 
     const handler = (ev: KeyboardEvent) => {
-      if (hasWon()) {
-        return;
-      }
-
-      let deltaScore = 0;
-
-      function onMove(nextField: Tile[]) {
-        if (fieldsAreEqual(field(), nextField)) {
-          return;
-        }
-
-        setField(spawnRandomTile(nextField));
-        addScore(deltaScore);
-      }
-
       switch (ev.key) {
         case "ArrowUp": {
-          const matrix = buildMatrix(field());
-          const rotatedMatrixView = rotateMatrixClockwise(matrix);
-          const shifted = shiftMatrixRight(rotatedMatrixView, (n) => deltaScore += n);
-          const rotatedBack = rotateMatrixCounterClockwise(shifted);
-          const nextField = matrixToField(rotatedBack);
-          onMove(nextField);
+          onInput("up");
           break;
         }
         case "ArrowDown": {
-          const matrix = buildMatrix(field());
-          const rotatedMatrixView = rotateMatrixClockwise(rotateMatrixClockwise(rotateMatrixClockwise(matrix)));
-          const shifted = shiftMatrixRight(rotatedMatrixView, (n) => deltaScore += n);
-          const rotatedBack = rotateMatrixCounterClockwise(rotateMatrixCounterClockwise(rotateMatrixCounterClockwise(shifted)));
-          const nextField = matrixToField(rotatedBack);
-          onMove(nextField);
+          onInput("down");
           break;
         }
         case "ArrowRight": {
-          const matrixView = buildMatrix(field());
-          const shifted = shiftMatrixRight(matrixView, (n) => deltaScore += n);
-          const nextField = matrixToField(shifted);
-          onMove(nextField);
+          onInput("right");
           break;
         }
         case "ArrowLeft": {
-          const matrix = buildMatrix(field());
-          const rotatedMatrixView = rotateMatrixClockwise(rotateMatrixClockwise(matrix));
-          const shifted = shiftMatrixRight(rotatedMatrixView, (n) => deltaScore += n);
-          const rotatedBack = rotateMatrixCounterClockwise(rotateMatrixCounterClockwise(shifted));
-          const nextField = matrixToField(rotatedBack);
-          onMove(nextField);
+          onInput("left");
           break;
         }
       }
-    }
+    };
 
     document.addEventListener("keydown", handler);
 
     onCleanup(() => {
       document.removeEventListener("keydown", handler);
-    })
+    });
   })
+
+  onMount(() => {
+    let xDown: number | null = null;
+    let yDown: number | null = null;
+
+    function handleTouchStart(ev: TouchEvent) {
+      const [touch] = ev.touches;
+
+      if (touch) {
+        xDown = touch.clientX;
+        yDown = touch.clientY;
+      }
+    };
+
+    function handleTouchMove(ev: TouchEvent) {
+      if (!xDown || !yDown) {
+        return;
+      }
+
+      const [touch] = ev.touches;
+
+      if (!touch) {
+        return;
+      }
+
+      const xUp = touch.clientX;
+      const yUp = touch.clientY;
+
+      const xDiff = xDown - xUp;
+      const yDiff = yDown - yUp;
+
+      if (Math.abs(xDiff) > Math.abs(yDiff)) {
+        if (xDiff > 0) {
+          onInput("left")
+        } else {
+          onInput("right")
+        }
+      } else {
+        if (yDiff > 0) {
+          onInput("up")
+        } else {
+          onInput("down")
+        }
+      }
+
+      // Reset values
+      xDown = null;
+      yDown = null;
+    };
+
+
+    document.addEventListener('touchstart', handleTouchStart);
+    document.addEventListener('touchmove', handleTouchMove);
+
+    onCleanup(() => {
+      document.removeEventListener('touchstart', handleTouchStart)
+      document.removeEventListener('touchend', handleTouchMove)
+    });
+  });
 
   return <div>
     <div class="text-center mb-5">
